@@ -125,14 +125,18 @@ class Immich():
     session.mount('https://', adapter)
 
     while payload["page"] != None:
-      response = session.post(f"{self.api_url}/search/metadata", headers=self.headers, json=payload)
+    response = session.post(f"{self.api_url}/search/metadata", headers=self.headers, json=payload)
 
-      if not response.ok:
-        logger.error('   Error:', response.status_code, response.text)
+    if not response.ok:
+        logger.error("   Error: %s %s", response.status_code, response.text)
 
-      response_data = response.json()
-      assets_total = assets_total + response_data['assets']['items']
-      payload["page"] = response_data['assets']['nextPage']
+    response_data = response.json()
+
+    assets_total = assets_total + response_data['assets']['items']
+
+    next_page = response_data['assets']['nextPage']
+    payload["page"] = int(next_page) if next_page is not None else None
+
     
     self.assets = assets_total
     
